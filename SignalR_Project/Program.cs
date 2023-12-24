@@ -1,4 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+using SignalR_Project.Data;
 using SignalR_Project.Hubs;
+using SignalR_Project.Models.Services.Interface;
+using SignalR_Project.Models.Services.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +13,8 @@ var mvcBuilder = builder.Services.AddControllersWithViews();
 mvcBuilder.AddRazorRuntimeCompilation();
 #endif
 builder.Services.AddSignalR();
+builder.Services.AddDbContext<DataBaseContext>(o => o.UseSqlServer(DataBase.ConnectionString()));
+builder.Services.AddScoped<IChatRoomService, RChatRoomService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
