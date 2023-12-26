@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using SignalR_Project.Data;
 using SignalR_Project.Hubs;
+using SignalR_Project.Models.Entities;
 using SignalR_Project.Models.Services.Interface;
 using SignalR_Project.Models.Services.Repository;
 
@@ -15,6 +17,14 @@ mvcBuilder.AddRazorRuntimeCompilation();
 builder.Services.AddSignalR();
 builder.Services.AddDbContext<DataBaseContext>(o => o.UseSqlServer(DataBase.ConnectionString()));
 builder.Services.AddScoped<IChatRoomService, RChatRoomService>();
+builder.Services.AddAuthentication(o =>
+{
+    o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+}).AddCookie(o =>
+{
+    o.LoginPath = "/Home/login";
+})
+;
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -29,7 +39,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
