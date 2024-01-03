@@ -6,12 +6,20 @@ var supportConnection = new signalR.HubConnectionBuilder()
     .withUrl('/supporthub')
     .build();
 
+// ایجاد یک کانکشن با سرور سیگنال ار
+var chatConnection = new signalR.HubConnectionBuilder()
+    .withUrl('/chatHub')
+    .build();
+
 
 
 function Init() {
     supportConnection.start();
-
+    chatConnection.start();
 };
+
+chatConnection.on('getNewMessage', showMessage);
+
 
 // بعد از این که صفحه کامل بارگذاری شد  این بخش اجرا می شود
 $(document).ready(function () {
@@ -85,9 +93,17 @@ function setActiveRoomButton(el) {
 function switchActiveRoomTo(id) {
     if (id === activeRoomId) return;
 
+
     removeAllChildren(roomMessagesEl);
+
+    if (activeRoomId) {
+        chatConnection.invoke('LeaveRoom', activeRoomId);
+    }
+
+
     activeRoomId = id;
 
+    chatConnection.invoke('JoinRoom', activeRoomId);
     supportConnection.invoke('LoadMessage', activeRoomId);
 }
 

@@ -1,13 +1,14 @@
-﻿using SignalR_Project.Data;
+﻿using Microsoft.IdentityModel.Tokens;
+using SignalR_Project.Data;
 using SignalR_Project.Models.Dto;
 using SignalR_Project.Models.Entities;
 using SignalR_Project.Models.Services.Interface;
-
 namespace SignalR_Project.Models.Services.Repository;
 
 public class RMessageService : IMessageService
 {
     private readonly DataBaseContext context;
+
 
     public RMessageService(DataBaseContext context)
     {
@@ -15,6 +16,7 @@ public class RMessageService : IMessageService
     }
     public Task<List<MessageDto>> GetChatMessage(Guid RoomId)
     {
+
         var message = context.ChatMessages.Where(P => P.ChatRoom.Id == RoomId).Select(p => new MessageDto
         {
             Message = p.Message,

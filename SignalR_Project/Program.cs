@@ -5,6 +5,7 @@ using SignalR_Project.Hubs;
 using SignalR_Project.Models.Entities;
 using SignalR_Project.Models.Services.Interface;
 using SignalR_Project.Models.Services.Repository;
+using SignalR_Project.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ builder.Services.AddSignalR();
 builder.Services.AddDbContext<DataBaseContext>(o => o.UseSqlServer(DataBase.ConnectionString()));
 builder.Services.AddScoped<IChatRoomService, RChatRoomService>();
 builder.Services.AddScoped<IMessageService, RMessageService>();
+builder.Services.AddScoped<Utility, Utility>();
 builder.Services.AddAuthentication(o =>
 {
     o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;

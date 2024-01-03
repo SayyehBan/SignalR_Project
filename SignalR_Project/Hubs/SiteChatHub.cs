@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 using SignalR_Project.Models.Dto;
 using SignalR_Project.Models.Services.Interface;
 
@@ -6,27 +7,53 @@ namespace SignalR_Project.Hubs
 {
     public class SiteChatHub : Hub
     {
-        private readonly IChatRoomService chatRoomService;
-        private readonly IMessageService messageService;
-
+        private readonly IChatRoomService _chatRoomService;
+        private readonly IMessageService _messageService;
         public SiteChatHub(IChatRoomService chatRoomService, IMessageService messageService)
         {
-            this.chatRoomService = chatRoomService;
-            this.messageService = messageService;
+            _chatRoomService = chatRoomService;
+            _messageService = messageService;
         }
+
         public async Task SendNewMessage(string Sender, string Message)
         {
-            var roomID = await chatRoomService.GetChatRoomForConnection(Context.ConnectionId);
+            var roomId = await _chatRoomService.GetChatRoomForConnection(Context.ConnectionId);
+
             MessageDto messageDto = new MessageDto()
             {
                 Message = Message,
                 Sender = Sender,
-                DateTime = DateTime.UtcNow,
+                DateTime = DateTime.Now,
             };
-            await messageService.SaveChatMessage(roomID, messageDto);
-            await Clients.Groups(roomID.ToString())
+
+            await _messageService.SaveChatMessage(roomId, messageDto);
+            await Clients.Groups(roomId.ToString())
                 .SendAsync("getNewMessage", messageDto.Sender, messageDto.Message, messageDto.DateTime.ToShortDateString());
         }
+
+        /// <summary>
+        /// پیوستن پشتیبان ها به گروه
+        /// </summary>
+        /// <param name="roomId"></param>
+        /// <returns></returns>
+        /// 
+        [Authorize]
+        public async Task JoinRoom(Guid roomId)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, roomId.ToString());
+        }
+
+        /// <summary>
+        /// ترک گروه توسط پشتیبان
+        /// </summary>
+        /// <param name="roomId"></param>
+        /// <returns></returns>
+        [Authorize]
+        public async Task LeaveRoom(Guid roomId)
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId.ToString());
+        }
+
 
         public override async Task OnConnectedAsync()
         {
@@ -35,11 +62,11 @@ namespace SignalR_Project.Hubs
                 await base.OnConnectedAsync();
                 return;
             }
-            var rommId = await chatRoomService.CreateChatRoom(Context.ConnectionId);
-            await Groups.AddToGroupAsync(Context.ConnectionId, rommId.ToString());
+            var roomId = await _chatRoomService.CreateChatRoom(Context.ConnectionId);
 
+            await Groups.AddToGroupAsync(Context.ConnectionId, roomId.ToString());
             await Clients.Caller.
-                SendAsync("getNewMessage", "پشتیبانی سایه بان", "درود وقت بخیر 👋 . چطور میتونم کمکتون کنم؟", DateTime.UtcNow.ToShortTimeString());
+                SendAsync("getNewMessage", "پشتیبانی باگتو", "سلام وقت بخیر 👋 . چطور میتونم کمکتون کنم؟", DateTime.Now.ToShortTimeString());
             await base.OnConnectedAsync();
         }
 
