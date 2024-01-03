@@ -1,4 +1,5 @@
-﻿using SignalR_Project.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using SignalR_Project.Data;
 using SignalR_Project.Models.Entities;
 using SignalR_Project.Models.Services.Interface;
 
@@ -32,7 +33,7 @@ public class RChatRoomService : IChatRoomService
 
     public async Task<List<Guid>> GetAllRooms()
     {
-        var rooms = context.ChatRooms.Select(p => p.Id).ToList();
+        var rooms = context.ChatRooms.Include(p => p.ChatMessages).Where(p => p.ChatMessages.Any()).Select(p => p.Id).ToList();
         return await Task.FromResult(rooms);
     }
 
