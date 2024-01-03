@@ -30,6 +30,12 @@ public class RChatRoomService : IChatRoomService
         return await Task.FromResult(chatRoom.Id);
     }
 
+    public async Task<List<Guid>> GetAllRooms()
+    {
+        var rooms = context.ChatRooms.Select(p => p.Id).ToList();
+        return await Task.FromResult(rooms);
+    }
+
     public async Task<Guid> GetChatRoomForConnection(string ConnectionID)
     {
         var chatRoom = context.ChatRooms.SingleOrDefault(p => p.ConnectionId == ConnectionID);

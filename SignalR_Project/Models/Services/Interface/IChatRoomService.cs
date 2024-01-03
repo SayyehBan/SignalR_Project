@@ -5,4 +5,6 @@ public interface IChatRoomService
     Task<Guid> CreateChatRoom(string ConnectionID);
     Task<Guid> GetChatRoomForConnection(string ConnectionID);
 
+    Task <List<Guid>> GetAllRooms();
+
 }

@@ -17,6 +17,7 @@ mvcBuilder.AddRazorRuntimeCompilation();
 builder.Services.AddSignalR();
 builder.Services.AddDbContext<DataBaseContext>(o => o.UseSqlServer(DataBase.ConnectionString()));
 builder.Services.AddScoped<IChatRoomService, RChatRoomService>();
+builder.Services.AddScoped<IMessageService, RMessageService>();
 builder.Services.AddAuthentication(o =>
 {
     o.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -46,4 +47,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapHub<SiteChatHub>("/chathub");
+app.MapHub<SupportHub>("/supporthub");
 app.Run();
