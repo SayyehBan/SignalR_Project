@@ -15,7 +15,7 @@ public class RMessageService : IMessageService
     }
     public Task<List<MessageDto>> GetChatMessage(Guid RoomId)
     {
-        var message = context.ChatMessages.Where(P => P.Id == RoomId).ToList().Select(p => new MessageDto
+        var message = context.ChatMessages.Where(P => P.ChatRoom.Id == RoomId).Select(p => new MessageDto
         {
             Message = p.Message,
             Sender = p.Sender,

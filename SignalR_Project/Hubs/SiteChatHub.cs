@@ -30,6 +30,11 @@ namespace SignalR_Project.Hubs
 
         public override async Task OnConnectedAsync()
         {
+            if (Context.User.Identity.IsAuthenticated)
+            {
+                await base.OnConnectedAsync();
+                return;
+            }
             var rommId = await chatRoomService.CreateChatRoom(Context.ConnectionId);
             await Groups.AddToGroupAsync(Context.ConnectionId, rommId.ToString());
 
